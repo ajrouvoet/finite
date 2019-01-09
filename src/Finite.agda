@@ -16,7 +16,7 @@ open import Function.LeftInverse as ↞ using (LeftInverse; _↞_)
 open import Function.Equality as Π using (_⟨$⟩_; cong)
 open import Level
 open import Relation.Binary
-open import Relation.Binary.PropositionalEquality as ≡ using (_≡_; _≗_; refl; subst)
+open import Relation.Binary.PropositionalEquality as ≡ using (_≡_; _≗_; refl; subst; isPropositional)
 open import Relation.Nullary
 open import Relation.Nullary.Decidable as Decidable
 open import Relation.Nullary.Negation
@@ -95,6 +95,16 @@ record IsFinite {ℓ₁} (A : Set ℓ₁) : Set ℓ₁ where
     filter-∃-∈ {as = a ∷ as} (there e) pa with P? a
     filter-∃-∈ (there e) pa | yes pa′ = there (filter-∃-∈ e pa)
     filter-∃-∈ (there e) pa | no ¬pa = filter-∃-∈ e pa
+
+    filter-∃-prop : (∀ {x} → isPropositional (P x)) → IsFinite (∃ P)
+    filter-∃-prop prop = record
+      { elements = filter-∃ elements
+      ; membership = λ where
+          (a , pa) →
+            subst (λ z → (a , z) ∈ filter-∃ elements)
+              (prop _ pa)
+              (filter-∃-∈ (membership a) (fromWitness pa)) 
+      }
 
     filter-∃-True : List A → List (∃ (True ∘ P?))
     filter-∃-True = List.map (Σ.map₂ fromWitness) ∘ filter-∃
