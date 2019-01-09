@@ -6,7 +6,7 @@ open import Data.List.Properties as ListProps
 open import Data.List.Any
 open import Data.List.Membership.Propositional
 open import Data.List.Membership.Propositional.Properties hiding (finite)
-open import Data.List.Relation.Sublist.Propositional
+open import Data.List.Relation.Subset.Propositional
 open import Data.Product as Σ
 open import Data.Sum as ⊎
 open import Data.Vec as Vec using (Vec; []; _∷_)
@@ -59,7 +59,7 @@ record IsFinite {ℓ₁} (A : Set ℓ₁) : Set ℓ₁ where
             (inj₁ (_ , ¬pa)) → ¬pa pa
             (inj₂ ())
         go xs (y ∷ ys) elem = case P? y of λ where
-          (yes py) → yes (, py)
+          (yes py) → yes (-, py)
           (no ¬py) → go (y ∷ xs) ys λ a →
             case elem a of λ where
               (inj₁ (a∈xs , ¬pa)) → inj₁ (there a∈xs , ¬pa)
@@ -85,7 +85,7 @@ record IsFinite {ℓ₁} (A : Set ℓ₁) : Set ℓ₁ where
     filter-∃ [] = []
     filter-∃ (a ∷ as) =
       case P? a of λ where
-        (yes pa) → (, pa) ∷ filter-∃ as
+        (yes pa) → (-, pa) ∷ filter-∃ as
         (no ¬pa) → filter-∃ as
 
     filter-∃-∈ : ∀ {a as} → a ∈ as → (pa : True (P? a)) → (a , toWitness pa) ∈ filter-∃ as
@@ -104,7 +104,7 @@ record IsFinite {ℓ₁} (A : Set ℓ₁) : Set ℓ₁ where
       subst
         (λ pa′ → (a , pa′) ∈ _)
         (fromWitness∘toWitness≗id _)
-        (∈-map⁺ (filter-∃-∈ e pa))
+        (∈-map⁺ _ (filter-∃-∈ e pa))
 
     filter : IsFinite (∃ (True ∘ P?))
     filter = record
@@ -155,6 +155,6 @@ open IsFinite
 via-left-inverse : ∀ {ℓ₁ ℓ₂} {A : Set ℓ₁} {B : Set ℓ₂} → (A ↞ B) → IsFinite B → IsFinite A
 via-left-inverse f finB = record
   { elements = List.map (from ⟨$⟩_) (elements finB)
-  ; membership = λ a → subst (_∈ _) (left-inverse-of a) (∈-map⁺ (membership finB (to ⟨$⟩ a)))
+  ; membership = λ a → subst (_∈ _) (left-inverse-of a) (∈-map⁺ _ (membership finB (to ⟨$⟩ a)))
   }
   where open LeftInverse f
