@@ -13,6 +13,6 @@ instance
   ∈-IsFinite [] = finite [] λ ()
   ∈-IsFinite (x ∷ xs) =
     let finite es _∈es = ∈-IsFinite xs in
-      finite ((, here refl) ∷ List.map (×.map _ there) es) λ where
+      finite ((-, here refl) ∷ List.map (×.map _ there) es) λ where
         (_ , here refl) → here refl
-        (_ , there i) → there (∈-map⁺ ((, i) ∈es))
+        (_ , there i) → there (∈-map⁺ _ ((-, i) ∈es))
