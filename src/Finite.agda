@@ -15,10 +15,11 @@ open import Function
 open import Function.LeftInverse as ↞ using (LeftInverse; _↞_)
 open import Function.Equality as Π using (_⟨$⟩_; cong)
 open import Level
-open import Relation.Binary
+open import Relation.Binary hiding (Decidable)
 open import Relation.Binary.PropositionalEquality as ≡ using (_≡_; _≗_; refl; subst; isPropositional)
+open import Relation.Unary using (Pred; Decidable)
 open import Relation.Nullary
-open import Relation.Nullary.Decidable as Decidable
+open import Relation.Nullary.Decidable as DecM
 open import Relation.Nullary.Negation
 
 fromWitness∘toWitness≗id : ∀ {ℓ} {A : Set ℓ} {A? : Dec A} → fromWitness {Q = A?} ∘ toWitness ≗ id
@@ -96,13 +97,13 @@ record IsFinite {ℓ₁} (A : Set ℓ₁) : Set ℓ₁ where
     filter-∃-∈ (there e) pa | yes pa′ = there (filter-∃-∈ e pa)
     filter-∃-∈ (there e) pa | no ¬pa = filter-∃-∈ e pa
 
-    filter-∃-prop : (∀ {x} → isPropositional (P x)) → IsFinite (∃ P)
+    filter-∃-prop : (∀ x → isPropositional (P x)) → IsFinite (∃ P)
     filter-∃-prop prop = record
       { elements = filter-∃ elements
       ; membership = λ where
           (a , pa) →
             subst (λ z → (a , z) ∈ filter-∃ elements)
-              (prop _ pa)
+              (prop _ _ pa)
               (filter-∃-∈ (membership a) (fromWitness pa)) 
       }
 
